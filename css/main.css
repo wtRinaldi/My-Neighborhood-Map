@@ -8,6 +8,23 @@
 	
 }
 
-.btn.active, .btn:active {
-    background-color: red;
+header {
+	padding: 20px 10px;	
+}
+
+#title {
+	font-family: 'Amatic SC', cursive;
+	margin: 16px 10px 0 0;
+	float: right;	
+	font-size: 100px;
+	display: inline;
+	white-space: nowrap;
+}
+
+#input {
+	padding: 0 0 20px 0;
+}
+
+.list-group-item {
+	margin: 2px 0;
 }
