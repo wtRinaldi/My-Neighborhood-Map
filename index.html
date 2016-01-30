@@ -25,16 +25,11 @@
         		<input class="form-control" id="focusedInput" placeholder="filter results" data-bind="textInput: userInput, event: {keyup: filterMarkers}">
       		</div>
 			<div class="list-group" data-bind="foreach: visiblePlaces">
-  				<button class="list-group-item" data-bind="text: locationName"></button>
+  				<button class="list-group-item" data-bind="text: locationName", "click: toggleBounce"></button>
   			</div>
 		</section>	
 
 		<div class="col-md-9" id="map"></div>
-
-
-
-
-
 
 
 <!-- Knockout CDN -->

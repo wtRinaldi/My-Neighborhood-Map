@@ -1,21 +1,4 @@
-var locationData = [
-  {
-    locationName: 'Canberra',
-    latLng: {lat: 33.282074, lng: -111.1288389},
-  },
-  
-  {
-    locationName: 'Sydney',
-    latLng: {lat: 33.8675828, lng: -111.2069007}
-  },
-  
-  {
-    locationName: 'Wollongong',
-    latLng: {lat: 33.4249389, lng: -111.8931158}
-  }
-];
-
-console.log(locationData);
+var locationData = [];
 
 	var fourSqClientID = 'B3GBLGC2TFDYJCL4HLM44XYRQ5MG1HF1PFBZUWOL0JQNLBL3';
 	var fourSqClientSecret = 'ODHJOFM0ABVVHB5AHXHZGPMP3QWOAAWDN4D1RIOL3DEKUVEW';
@@ -36,29 +19,28 @@ var appViewModel = function() {
   var self = this;
 
 
-function 
-  
-  function getFourSquare() {
-  	$.getJSON(fourSquareUri, function( data ) {
-
-		var venuesLength = data.response.venues.length;		
-		var name;
+ 		var name;
 		var lat;
 		var lng;
+  
+
+  	$.getJSON(fourSquareUri, function( data ) {
+  		var venuesLength = data.response.venues.length;		
+
 		for (var i = 0; i < venuesLength; i++) {
 			name = data.response.venues[i].name;
 			lat = data.response.venues[i].location.lat;
 			lng = data.response.venues[i].location.lng;
 			locationData.push({locationName: name, latLng: {lat: lat, lng: lng}});
-
-		}	  	
+		}
+		getAllData();
 	});
-  };
-  getFourSquare();
+  
+
   // Build the Google Map object. Store a reference to it.
   var googleMap = new google.maps.Map(document.getElementById('map'), {
     center: {lat: 33.397, lng: -111.644},
-    zoom: 8
+    zoom: 11
   });
    
   
@@ -68,42 +50,61 @@ function
   // data and also lets you add on anything else you need for your app, not
   // limited by the original data.
   self.allPlaces = [];
-  locationData.forEach(function(place) {
-    self.allPlaces.push(new Place(place));
-  });
-
-  
-  
-  // Build Markers via the Maps API and place them on the map.
- 		self.allPlaces.forEach(function(place) {
-    		var markerOptions = {
-      		map: googleMap,
-      		position: place.latLng
-    	};
-    place.marker = new google.maps.Marker(markerOptions);
-    // You might also add listeners onto the marker, such as "click" listeners.
-  	});
-  
   // This array will contain what its name implies: only the markers that should
   // be visible based on user input. My solution does not need to use an 
   // observableArray for this purpose, but other solutions may require that.
   self.visiblePlaces = ko.observableArray([]);
-  
-  
+  // This, along with the data-bind on the <input> element, lets KO keep 
+  // constant awareness of what the user has entered. It stores the user's 
+  // input at all times.
+  self.userInput = ko.observable('');
+
+function getAllData() {
+  	locationData.forEach(function(place) {
+    	self.allPlaces.push(new Place(place));
+	});
+
+
+	function Place(data) {
+    	this.locationName = data.locationName;
+    	this.latLng = data.latLng;
+    	this.marker = null;
+  	}
+    
+  // Build Markers via the Maps API and place them on the map.
+ 		self.allPlaces.forEach(function(place) {
+    		var markerOptions = {
+      		map: googleMap,
+      		position: place.latLng,
+      		draggable: false,
+      		animation: google.maps.Animation.DROP
+    	};
+    place.marker = new google.maps.Marker(markerOptions);
+    place.marker.addListener('click', toggleBounce);
+    // You might also add listeners onto the marker, such as "click" listeners.
+  	});
+
+ 	function toggleBounce() {
+  if (marker.getAnimation() !== null) {
+    marker.setAnimation(null);
+  } else {
+    marker.setAnimation(google.maps.Animation.BOUNCE);
+  }
+};
+    
   // All places should be visible at first. We only want to remove them if the
   // user enters some input which would filter some of them out.
   self.allPlaces.forEach(function(place) {
     self.visiblePlaces.push(place);
   });
+};
   
+
+
+
+
   
-  // This, along with the data-bind on the <input> element, lets KO keep 
-  // constant awareness of what the user has entered. It stores the user's 
-  // input at all times.
-  self.userInput = ko.observable('');
-  
-  
-  // The filter will look at the names of the places the Markers are standing
+    // The filter will look at the names of the places the Markers are standing
   // for, and look at the user input in the search box. If the user input string
   // can be found in the place name, then the place is allowed to remain 
   // visible. All other markers are removed.
@@ -128,14 +129,7 @@ function
     });
   };
     
-	function Place(data) {
-    	this.locationName = data.locationName;
-    	this.latLng = data.latLng;
-    
-    // You will save a reference to the Places' map marker after you build the
-    // marker:
-    	this.marker = null;
-  }
+	
 
 
 
