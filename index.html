@@ -3,6 +3,7 @@
 	<head>
 		<meta charset = "UTF-8">
 		<title>Find me Sushi</title>
+		
 		<link rel="stylesheet" href="css/main.css">
 		<link href='https://fonts.googleapis.com/css?family=Amatic+SC:400,700' rel='stylesheet' type='text/css'>
 
@@ -11,6 +12,7 @@
 
 		<!-- Optional theme -->
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
 	</head>
 
 	<body>
@@ -20,18 +22,14 @@
 				<h1 id="title">SUSHI-GO-SEEK</h1>
 			</header>
 			<div id="input">
-        		<input class="form-control" id="focusedInput" type="text" data-bind="value: filter, valueUpdate: 'afterkeydown'">
+        		<input class="form-control" id="focusedInput" placeholder="filter results" data-bind="textInput: userInput, event: {keyup: filterMarkers}">
       		</div>
-			<div class="list-group" data-bind="foreach: filteredRestaurant">
-  				<button class="list-group-item" data-bind="text: name"></button>
-  			</div>
-  			<div class="list-group" data-bind="foreach: localRestaurant">
-  				<button class="list-group-item" data-bind="text: lat"></button>
+			<div class="list-group" data-bind="foreach: visiblePlaces">
+  				<button class="list-group-item" data-bind="text: locationName"></button>
   			</div>
 		</section>	
 
-		<!-- google map div which sets map size -->
-		<div class="col-md-9" id="googleMap"></div>
+		<div class="col-md-9" id="map"></div>
 
 
 

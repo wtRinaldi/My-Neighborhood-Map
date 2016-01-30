@@ -1,25 +1,46 @@
-function sushiRestaurant(name, lat, lng) {
-	var self = this;	
-	self.name = ko.observable(name);
-	self.lat = lat;
-	self.lng = lng;
-}
+var locationData = [
+  {
+    locationName: 'Canberra',
+    latLng: {lat: 33.282074, lng: -111.1288389},
+  },
+  
+  {
+    locationName: 'Sydney',
+    latLng: {lat: 33.8675828, lng: -111.2069007}
+  },
+  
+  {
+    locationName: 'Wollongong',
+    latLng: {lat: 33.4249389, lng: -111.8931158}
+  }
+];
 
-function appViewModel(){
-
-	var self = this;
+console.log(locationData);
 
 	var fourSqClientID = 'B3GBLGC2TFDYJCL4HLM44XYRQ5MG1HF1PFBZUWOL0JQNLBL3';
 	var fourSqClientSecret = 'ODHJOFM0ABVVHB5AHXHZGPMP3QWOAAWDN4D1RIOL3DEKUVEW';
 	var searchTown = 'Fountain Hills, AZ';
-	var fourSquareUrl = 'https://api.foursquare.com/v2/venues/search?client_id='+ fourSqClientID +
+	var fourSquareUri = 'https://api.foursquare.com/v2/venues/search?client_id='+ fourSqClientID +
 		'&client_secret='+ fourSqClientSecret +
 		'&v=20160115'+
 		'&near='+ searchTown +
 		'&radius=15000'+
 		'&query=sushi';
 
-	$.getJSON(fourSquareUrl, function( data ) {		
+	//function addData () {
+	//	 locationData.push({locationName: name, latLng: {lat: lat, lng: lng}});
+	//};
+	//addData();
+
+var appViewModel = function() {
+  var self = this;
+
+
+function 
+  
+  function getFourSquare() {
+  	$.getJSON(fourSquareUri, function( data ) {
+
 		var venuesLength = data.response.venues.length;		
 		var name;
 		var lat;
@@ -28,46 +49,101 @@ function appViewModel(){
 			name = data.response.venues[i].name;
 			lat = data.response.venues[i].location.lat;
 			lng = data.response.venues[i].location.lng;
-			self.localRestaurant.push(new sushiRestaurant(name, lat, lng));
+			locationData.push({locationName: name, latLng: {lat: lat, lng: lng}});
+
 		}	  	
 	});
+  };
+  getFourSquare();
+  // Build the Google Map object. Store a reference to it.
+  var googleMap = new google.maps.Map(document.getElementById('map'), {
+    center: {lat: 33.397, lng: -111.644},
+    zoom: 8
+  });
+   
+  
+  // Build "Place" objects out of raw place data. It is common to receive place
+  // data from an API like FourSquare. Place objects are defined by a custom
+  // constructor function you write, which takes what you need from the original
+  // data and also lets you add on anything else you need for your app, not
+  // limited by the original data.
+  self.allPlaces = [];
+  locationData.forEach(function(place) {
+    self.allPlaces.push(new Place(place));
+  });
 
-	self.localRestaurant = ko.observableArray([]);
-	
-	self.filter = ko.observable('');
-	filteredRestaurant = ko.computed(function() {
-       	var filter = self.filter().toLowerCase();
-    		if (!filter) {
-        		return self.localRestaurant();
-    		} else {
-        		return ko.utils.arrayFilter(self.localRestaurant(), function(sushiRestaurant) {
-        			return !sushiRestaurant.name().toLowerCase().indexOf(filter);
-        		});
-    		}
-	});
+  
+  
+  // Build Markers via the Maps API and place them on the map.
+ 		self.allPlaces.forEach(function(place) {
+    		var markerOptions = {
+      		map: googleMap,
+      		position: place.latLng
+    	};
+    place.marker = new google.maps.Marker(markerOptions);
+    // You might also add listeners onto the marker, such as "click" listeners.
+  	});
+  
+  // This array will contain what its name implies: only the markers that should
+  // be visible based on user input. My solution does not need to use an 
+  // observableArray for this purpose, but other solutions may require that.
+  self.visiblePlaces = ko.observableArray([]);
+  
+  
+  // All places should be visible at first. We only want to remove them if the
+  // user enters some input which would filter some of them out.
+  self.allPlaces.forEach(function(place) {
+    self.visiblePlaces.push(place);
+  });
+  
+  
+  // This, along with the data-bind on the <input> element, lets KO keep 
+  // constant awareness of what the user has entered. It stores the user's 
+  // input at all times.
+  self.userInput = ko.observable('');
+  
+  
+  // The filter will look at the names of the places the Markers are standing
+  // for, and look at the user input in the search box. If the user input string
+  // can be found in the place name, then the place is allowed to remain 
+  // visible. All other markers are removed.
+  self.filterMarkers = function() {
+    var searchInput = self.userInput().toLowerCase();
+    
+    self.visiblePlaces.removeAll();
+    
+    // This looks at the name of each places and then determines if the user
+    // input can be found within the place name.
+    self.allPlaces.forEach(function(place) {
+      place.marker.setVisible(false);
+      
+      if (place.locationName.toLowerCase().indexOf(searchInput) !== -1) {
+        self.visiblePlaces.push(place);
+      }
+    });
+    
+    
+    self.visiblePlaces().forEach(function(place) {
+      place.marker.setVisible(true);
+    });
+  };
+    
+	function Place(data) {
+    	this.locationName = data.locationName;
+    	this.latLng = data.latLng;
+    
+    // You will save a reference to the Places' map marker after you build the
+    // marker:
+    	this.marker = null;
+  }
 
-	var myCenter = new google.maps.LatLng(33.6038895,-111.7262195);
-	
-	function initialize() {
-  		var mapProp = {
-    	center: myCenter,
-    	zoom:13,
-    	mapTypeId:google.maps.MapTypeId.ROADMAP
-  	};
 
-  	var map = new google.maps.Map(document.getElementById("googleMap"),mapProp);
 
-  	var marker = new google.maps.Marker({
-		position:myCenter,
-	});
-	marker.setMap(map);
 
-}
-google.maps.event.addDomListener(window, 'load', initialize);
 
+  
 };
 
 ko.applyBindings(new appViewModel());
 
-
-
+  
