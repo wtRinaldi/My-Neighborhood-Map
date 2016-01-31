@@ -27,7 +27,7 @@ var appViewModel = function() {
 	});
 // Build the Google Map object. Store a reference to it.
 	var googleMap = new google.maps.Map(document.getElementById('map'), {
-		center: {lat: 33.397, lng: -111.644},
+		center: {lat: 33.5, lng: -111.9333},
 		zoom: 11
 	});
 // Build "Place" objects out of raw place data. It is common to receive place
@@ -77,6 +77,10 @@ var appViewModel = function() {
 		place.marker.addListener('click', function () {
 			toggleBounce();
 			openInfoWindow();
+		});
+
+		place.marker.InfoWindow.addListener('closeclick', function () {
+			place.marker.setAnimation(null);
 		});
 	// You might also add listeners onto the marker, such as "click" listeners.
 		function toggleBounce() {
