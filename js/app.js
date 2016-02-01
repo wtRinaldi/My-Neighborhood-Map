@@ -10,18 +10,22 @@ var locationData = [];
 		'&radius=15000'+
 		'&query=sushi';
 
+function createContent(name, phone, address) {
+	return '<div><h2>' + name + '</h2></div><div><h4>' + phone + '</h4></div><div><p>' + address + '</p></div>';
+}
+
 var appViewModel = function() {
 	var self = this;
-	var name, lat, lng;
-	
+	var name, lat, lng, address, phone;
 	$.getJSON(fourSquareUri, function( data ) {
-		var venuesLength = data.response.venues.length;		
+		var venuesLength = data.response.venues.length;
 		for (var i = 0; i < venuesLength; i++) {
 			name = data.response.venues[i].name;
 			lat = data.response.venues[i].location.lat;
 			lng = data.response.venues[i].location.lng;
 			address = data.response.venues[i].location.address;
-			locationData.push({locationName: name, latLng: {lat: lat, lng: lng}});
+			phone = data.response.venues[i].contact.formattedPhone;
+			locationData.push({locationName: name, latLng: {lat: lat, lng: lng}, locationAddress: address, locationPhone: phone});
 		}
 		getAllData();
 	});
@@ -50,30 +54,34 @@ var appViewModel = function() {
 			self.allPlaces.push(new Place(place));
 		});
 
-	function Place(data) {
-		this.locationName = data.locationName;
-		this.latLng = data.latLng;
-		this.marker = null;
-		this.openInfoWindow;
-	};
+		function Place(data) {
+			this.locationName = data.locationName;
+			this.latLng = data.latLng;
+			this.address = data.locationAddress;
+			this.phone = data.locationPhone;
+			this.marker = null;
+			this.selectLocation = function() {
+				this.marker.InfoWindow.open(googleMap);
+			};
+		};
 
 // Build Markers via the Maps API and place them on the map.
-	self.allPlaces.forEach(function(place) {
-		var markerOptions = {
-			map: googleMap,
-			position: place.latLng,
-			draggable: false,
-			animation: google.maps.Animation.DROP
-		}
+		self.allPlaces.forEach(function(place) {
+			var markerOptions = {
+				map: googleMap,
+				position: place.latLng,
+				draggable: false,
+				animation: google.maps.Animation.DROP
+			}
 
 		place.marker = new google.maps.Marker(markerOptions);
 
 		place.marker.InfoWindow = new google.maps.InfoWindow({
 			position: place.latLng,
-			pixelOffset: new google.maps.Size(30, -30),
-			content: "Hi"
+			pixelOffset: new google.maps.Size(20, -20),
+			content: createContent(place.locationName, place.phone, place.address)
 		});
-		//place.marker.infoWindow.setContent(place.marker.content);
+
 		place.marker.addListener('click', function () {
 			toggleBounce();
 			openInfoWindow();
@@ -90,6 +98,7 @@ var appViewModel = function() {
 				place.marker.setAnimation(google.maps.Animation.BOUNCE);
 			};
 		};
+
 		function openInfoWindow() {
 			place.marker.InfoWindow.open(googleMap);
 		};
@@ -101,7 +110,6 @@ var appViewModel = function() {
 		self.visiblePlaces.push(place);
 	});
 };
-
 	// The filter will look at the names of the places the Markers are standing
   // for, and look at the user input in the search box. If the user input string
   // can be found in the place name, then the place is allowed to remain 
