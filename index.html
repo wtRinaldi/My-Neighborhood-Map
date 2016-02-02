@@ -2,7 +2,8 @@
 <html lang="en">
 	<head>
 		<meta charset = "UTF-8">
-		<title>Find me Sushi</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>SUSHI-GO-SEEK</title>
 		
 		<link rel="stylesheet" href="css/main.css">
 		<link href='https://fonts.googleapis.com/css?family=Amatic+SC:400,700' rel='stylesheet' type='text/css'>
@@ -18,13 +19,15 @@
 	<body>
 		<section class="col-md-3">
 			<header>
-				<img src="images/happy-sushi.png">
+				<img id="logo" src="images/happy-sushi.png">
 				<h1 id="title">SUSHI-GO-SEEK</h1>
 			</header>
 			<div id="input">
         		<input class="form-control" id="focusedInput" placeholder="filter results" data-bind="textInput: userInput, event: {keyup: filterMarkers}">
       		</div>
+<!-- div class to create Bootstrap buttons for each place in the visiblePlaces KO observable Array -->
 			<div class="list-group" data-bind="foreach: visiblePlaces">
+<!-- button class that has a data bind to show local name and also a click condition to display the infoWindow -->
   				<button class="list-group-item" data-bind="text: locationName, click: selectLocation"></button>
   			</div>
 		</section>	
@@ -42,9 +45,9 @@
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
 <!-- google maps cdn -->
-<script src="http://maps.googleapis.com/maps/api/js"></script>
+<script async src="http://maps.googleapis.com/maps/api/js"></script>
 
-
+<!-- calls javaScript file -->
 <script src="js/app.js"></script>
 
 	</body>

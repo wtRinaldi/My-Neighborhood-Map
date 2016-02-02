@@ -1,5 +1,6 @@
+// array that stores content from the JSON 
 var locationData = [];
-
+// foursquare variables for JSON request
 	var fourSqClientID = 'B3GBLGC2TFDYJCL4HLM44XYRQ5MG1HF1PFBZUWOL0JQNLBL3';
 	var fourSqClientSecret = 'ODHJOFM0ABVVHB5AHXHZGPMP3QWOAAWDN4D1RIOL3DEKUVEW';
 	var searchTown = 'Fountain Hills, AZ';
@@ -9,63 +10,65 @@ var locationData = [];
 		'&near='+ searchTown +
 		'&radius=15000'+
 		'&query=sushi';
-
+// function that creates content for the infoWindow
 function createContent(name, phone, address) {
 	return '<div><h2>' + name + '</h2></div><div><h4>' + phone + '</h4></div><div><p>' + address + '</p></div>';
 }
-
+// start view model
 var appViewModel = function() {
 	var self = this;
 	var name, lat, lng, address, phone;
+	// JSON request to FourSquare
 	$.getJSON(fourSquareUri, function( data ) {
 		var venuesLength = data.response.venues.length;
 		for (var i = 0; i < venuesLength; i++) {
+			
 			name = data.response.venues[i].name;
 			lat = data.response.venues[i].location.lat;
 			lng = data.response.venues[i].location.lng;
 			address = data.response.venues[i].location.address;
 			phone = data.response.venues[i].contact.formattedPhone;
+		if (address && phone) {
 			locationData.push({locationName: name, latLng: {lat: lat, lng: lng}, locationAddress: address, locationPhone: phone});
 		}
-		getAllData();
+		}
+		//run function to populate array after the data from JSON request is received
+		getData();
 	});
-// Build the Google Map object. Store a reference to it.
+// creates new google map
 	var googleMap = new google.maps.Map(document.getElementById('map'), {
 		center: {lat: 33.5, lng: -111.9333},
 		zoom: 11
 	});
-// Build "Place" objects out of raw place data. It is common to receive place
-// data from an API like FourSquare. Place objects are defined by a custom
-// constructor function you write, which takes what you need from the original
-// data and also lets you add on anything else you need for your app, not
-// limited by the original data.
+// stores all place objects
 	self.allPlaces = [];
-// This array will contain what its name implies: only the markers that should
-// be visible based on user input. My solution does not need to use an 
-// observableArray for this purpose, but other solutions may require that.
+// array stores all filtered locations 
 	self.visiblePlaces = ko.observableArray([]);
-// This, along with the data-bind on the <input> element, lets KO keep 
-// constant awareness of what the user has entered. It stores the user's 
-// input at all times.
+
+// this is the user input for the filter
 	self.userInput = ko.observable('');
 
-	function getAllData() {
+// process to get data and run infoWindow
+	function getData() {
+// pushes instances of place into array
 		locationData.forEach(function(place) {
 			self.allPlaces.push(new Place(place));
 		});
-
+//function to create an instance of Place
 		function Place(data) {
 			this.locationName = data.locationName;
 			this.latLng = data.latLng;
 			this.address = data.locationAddress;
 			this.phone = data.locationPhone;
 			this.marker = null;
+			//allows for ko.to open window with button click
 			this.selectLocation = function() {
 				this.marker.InfoWindow.open(googleMap);
+				this.marker.setAnimation(google.maps.Animation.BOUNCE);
 			};
 		};
 
-// Build Markers via the Maps API and place them on the map.
+// for each place in array sets location and options for marker
 		self.allPlaces.forEach(function(place) {
 			var markerOptions = {
 				map: googleMap,
@@ -73,24 +76,24 @@ var appViewModel = function() {
 				draggable: false,
 				animation: google.maps.Animation.DROP
 			}
-
+// creates a new marker with options
 		place.marker = new google.maps.Marker(markerOptions);
-
+// creates a infoWindow for marker
 		place.marker.InfoWindow = new google.maps.InfoWindow({
 			position: place.latLng,
 			pixelOffset: new google.maps.Size(20, -20),
 			content: createContent(place.locationName, place.phone, place.address)
 		});
-
+// listener for marker - opens infoWindow and toggles bounce
 		place.marker.addListener('click', function () {
 			toggleBounce();
 			openInfoWindow();
 		});
-
+// turns off animation when window is closed
 		place.marker.InfoWindow.addListener('closeclick', function () {
 			place.marker.setAnimation(null);
 		});
-	// You might also add listeners onto the marker, such as "click" listeners.
+// toggles bounce function
 		function toggleBounce() {
 			if (place.marker.getAnimation() !== null) {
 				place.marker.setAnimation(null);
@@ -98,36 +101,35 @@ var appViewModel = function() {
 				place.marker.setAnimation(google.maps.Animation.BOUNCE);
 			};
 		};
-
+// function to open infoWindow
 		function openInfoWindow() {
 			place.marker.InfoWindow.open(googleMap);
 		};
 	});
 	
-  // All places should be visible at first. We only want to remove them if the
-  // user enters some input which would filter some of them out.
+// takes each place in the allPlaces array and pushes them into the KO observable array
 	self.allPlaces.forEach(function(place) {
 		self.visiblePlaces.push(place);
 	});
 };
-	// The filter will look at the names of the places the Markers are standing
-  // for, and look at the user input in the search box. If the user input string
-  // can be found in the place name, then the place is allowed to remain 
-  // visible. All other markers are removed.
+
+
+// filter looks to the KO observable array and checks for matching conditions of the user input into filter bar
 self.filterMarkers = function() {
+	// sets all inputs to lowercase 
 	var searchInput = self.userInput().toLowerCase();
-	
+// removes all visible places
 	self.visiblePlaces.removeAll();
-	// This looks at the name of each places and then determines if the user
-	// input can be found within the place name.
+// looks over each place in allPlaces array 
 	self.allPlaces.forEach(function(place) {
-	place.marker.setVisible(false);
-	
-	if (place.locationName.toLowerCase().indexOf(searchInput) !== -1) {
-		self.visiblePlaces.push(place);
-	}
+// sets are markers to not visible
+		place.marker.setVisible(false);
+// anything at is at the index of the search should be pushed to the visible array
+		if (place.locationName.toLowerCase().indexOf(searchInput) !== -1) {
+			self.visiblePlaces.push(place);
+		}
 	});
-		
+// sets all markers to visible in the visiblePlaces KO observable array
 	self.visiblePlaces().forEach(function(place) {
 	  place.marker.setVisible(true);
 	});

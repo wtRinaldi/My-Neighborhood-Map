@@ -1,6 +1,4 @@
-/*{
-//	box-sizing: border-box;
-}*/
+
 html, body {
 	height: 100%;
 }
@@ -9,21 +7,22 @@ html, body {
 	height: 100%;
 }
 
-#list-container {
-	
-}
 
 header {
 	padding: 20px 10px;	
 }
 
+
 #title {
 	font-family: 'Amatic SC', cursive;
-	margin: 16px 10px 0 0;
-	float: right;	
-	font-size: 100px;
-	display: inline;
+	font-size: 94px;
 	white-space: nowrap;
+}
+
+@media (max-width: 1700px) {
+	#title {
+		font-size: 58px;
+	}
 }
 
 #input {
