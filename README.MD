@@ -10,7 +10,7 @@ This project has been completed to meets the requirements for the Udacity projec
 
 ## Features
 
-- responsive (although simplistic) design
+- responsive (although simplistic) design using bootstrap
 - map markers are populated on the map at the location of the sushi restaurant.
 - list is filterable by entering the name of the sushi location that you are looking for in the search bar
 - filtering the list also filters the map markers
@@ -42,7 +42,6 @@ Details about the nanodegree program can be seen here: https://www.udacity.com/c
 ## APIs
 
 * https://developers.google.com/maps/documentation/javascript/
-* https://developers.google.com/maps/documentation/streetview/
 * https://developer.foursquare.com/
 
 ## Contact
