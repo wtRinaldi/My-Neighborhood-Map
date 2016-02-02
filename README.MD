@@ -21,12 +21,6 @@ This project has been completed to meets the requirements for the Udacity projec
 ## Installation
 
 * use the application by going to https://github.com/wtRinaldi/My-Neighborhood-Map/tree/gh-pages
-* wget https://github.com/karoldavid/neighborhood-map/archive/master.zip
-
-* Internet connection
-* Internet Browser
-* JavaScript
-* Desktop, Tablet, Mobile Phone
 
 ## Design Pattern
 
