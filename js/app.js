@@ -120,7 +120,7 @@ var appViewModel = function() {
 		});
 	};
 // filter looks to the KO observable array and checks for matching conditions of the user input into filter bar
-	self.filterMarkers = function() {
+	self.filterMarkers = function(place) {
 	// sets all inputs to lowercase 
 		var searchInput = self.userInput().toLowerCase();
 	// removes all visible places
@@ -130,7 +130,7 @@ var appViewModel = function() {
 	// sets are markers to not visible
 			place.marker.setVisible(false);
 	// anything at is at the index of the search should be pushed to the visible array
-			if (self.place.locationName.toLowerCase().indexOf(searchInput) !== -1) {
+			if (place.locationName.toLowerCase().indexOf(searchInput) !== -1) {
 				self.visiblePlaces.push(place);
 			}
 		});
