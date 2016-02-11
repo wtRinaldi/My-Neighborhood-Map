@@ -24,6 +24,10 @@ function initMap() {
 	ko.applyBindings(new appViewModel());
 };
 
+function googleError() {
+	alert("Hello?  Google?  Are you there?");
+};
+
 var appViewModel = function() {
 	var self = this;
 	var name, lat, lng, address, phone;
@@ -43,7 +47,10 @@ var appViewModel = function() {
 		//run function to populate array after the data from JSON request is received
 		setData();
 	})
-	.error(function() { alert("Sorry, no sushi for you.  The servers are down.");});
+//alerts user that servers are down
+	.error(function() {
+		alert("Sorry, no sushi for you.  The servers are down.");
+	});
 // new infowindow
 	var InfoWindow = new google.maps.InfoWindow();
 // stores all place objects
