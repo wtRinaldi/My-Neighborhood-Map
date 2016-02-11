@@ -21,8 +21,7 @@ var appViewModel = function() {
 	// JSON request to FourSquare
 	$.getJSON(fourSquareUri, function( data ) {
 		var venuesLength = data.response.venues.length;
-		for (var i = 0; i < venuesLength; i++) {
-			
+		for (var i = 0; i < venuesLength; i++) {			
 			name = data.response.venues[i].name;
 			lat = data.response.venues[i].location.lat;
 			lng = data.response.venues[i].location.lng;
@@ -48,8 +47,15 @@ var appViewModel = function() {
 // array stores all filtered locations 
 	self.visiblePlaces = ko.observableArray([]);
 // this is the user input for the filter
-	self.userInput = ko.observable('');
+	self.userInput = ko.observable(''); 
 // process to get data and run infoWindow
+	function oneBounce(marker){
+		marker.setAnimation(google.maps.Animation.BOUNCE);
+		setTimeout(function() {
+			marker.setAnimation(null);
+		},750);
+	};
+
 	function setData() {
 //function to create an instance of Place
 		self.Place = function (data) {
@@ -58,11 +64,16 @@ var appViewModel = function() {
 			this.address = data.locationAddress;
 			this.phone = data.locationPhone;
 			this.marker = null;
-			this.InfoWindow = null;
+			this.InfoWindowOptions = {
+				position: data.latLng,
+				pixelOffset: new google.maps.Size(0, -20),
+				content: createContent(data.locationName, data.locationPhone, data.locationAddress)
+			};
 			//allows for ko.to open window with button click
 			this.selectLocation = function() {
-				this.marker.InfoWindow.open(googleMap);
-				this.marker.setAnimation(google.maps.Animation.BOUNCE);
+				InfoWindow.setOptions(this.InfoWindowOptions);
+				InfoWindow.open(googleMap, this.marker);
+				oneBounce(this.marker);
 			};
 		};
 		// pushes instances of place into array
@@ -79,26 +90,18 @@ var appViewModel = function() {
 			};
 			var InfoWindowOptions = {
 				position: place.latLng,
-				pixelOffset: new google.maps.Size(20, -20),
+				pixelOffset: new google.maps.Size(0, -20),
 				content: createContent(place.locationName, place.phone, place.address)
 			};
 // creates a new marker with options
 			place.marker = new google.maps.Marker(markerOptions);
 // listener for marker - opens infoWindow and toggles bounce
-			place.marker.addListener('click', function () {
+			place.marker.addListener('click', function() {
+// sets InfoWindowOptions for place
 				InfoWindow.setOptions(InfoWindowOptions);
 				InfoWindow.open(googleMap, place.marker);
-				toggleBounce();
+				oneBounce(place.marker);
 			});
-
-// toggles bounce function
-			function toggleBounce() {
-				if (place.marker.getAnimation() !== null) {
-					place.marker.setAnimation(null);
-				} else {
-					place.marker.setAnimation(google.maps.Animation.BOUNCE);
-				};
-			};
 		});
 // takes each place in the allPlaces array and pushes them into the KO observable array
 		self.allPlaces.forEach(function(place) {
