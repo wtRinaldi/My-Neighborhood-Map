@@ -18,6 +18,10 @@ This project has been completed to meets the requirements for the Udacity projec
 - closing the infoWindow will also stop animation
 - clicking sushi location from the list will open the infoWindow
 
+## Installation
+
+The application can been found at: http://wtrinaldi.github.io/My-Neighborhood-Map/
+
 ## Design Pattern
 
 Design patterns assist in developing manageable codebases. Frameworks can decrease the time required developing an application
