@@ -14,7 +14,16 @@ var locationData = [];
 function createContent(name, phone, address) {
 	return '<div><h2>' + name + '</h2></div><div><h4>' + phone + '</h4></div><div><p>' + address + '</p></div>';
 }
-// start view model
+//callback function to async load googleMap
+var googleMap;
+function initMap() {
+	googleMap = new google.maps.Map(document.getElementById('map'), {
+		center: {lat: 33.5, lng: -111.9333},
+		zoom: 11
+	});
+	ko.applyBindings(new appViewModel());
+};
+
 var appViewModel = function() {
 	var self = this;
 	var name, lat, lng, address, phone;
@@ -35,11 +44,6 @@ var appViewModel = function() {
 		setData();
 	})
 	.error(function() { alert("Sorry, no sushi for you.  The servers are down.");});
-// creates new google map
-	var googleMap = new google.maps.Map(document.getElementById('map'), {
-		center: {lat: 33.5, lng: -111.9333},
-		zoom: 11
-	});
 // new infowindow
 	var InfoWindow = new google.maps.InfoWindow();
 // stores all place objects
@@ -129,4 +133,3 @@ var appViewModel = function() {
 		});
 	};
 };
-ko.applyBindings(new appViewModel());
