@@ -40,8 +40,8 @@ var appViewModel = function() {
 			lng = data.response.venues[i].location.lng;
 			address = data.response.venues[i].location.address;
 			phone = data.response.venues[i].contact.formattedPhone;
-			if (address && phone) {
-				locationData.push({locationName: name, latLng: {lat: lat, lng: lng}, locationAddress: address, locationPhone: phone});
+			if (address) {
+				locationData.push({locationName: name, latLng: {lat: lat, lng: lng}, locationAddress: address});
 			};
 		};
 		//run function to populate array after the data from JSON request is received
