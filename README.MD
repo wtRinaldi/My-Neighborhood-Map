@@ -28,10 +28,6 @@ Design patterns assist in developing manageable codebases. Frameworks can decrea
 and provide a number of utilities. Third-party APIs provide valuable data sets that can improve the application's quality, 
 for ex.: knockout.js helps to simplify dynamic JavaScript UIs using the Model-View-ViewModel (MVVM) pattern.
 
-## Front-End Developer Nanodegree
-
-This project was completed as part of the Udacity Front-End developer nanodegree.  The main focus of the project was to gain knowlegde of APIs and javaScript design patterns such as MVVM.
-Details about the nanodegree program can be seen here: https://www.udacity.com/course/front-end-web-developer-nanodegree--nd001
 
 ## APIs
 
@@ -41,3 +37,6 @@ Details about the nanodegree program can be seen here: https://www.udacity.com/c
 ## Contact
 
 williamtrinaldi@gmail.com
+
+## Notes
+This project is on my list to rework since foursquare has since changed their API
